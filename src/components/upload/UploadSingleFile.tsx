@@ -1,0 +1,65 @@
+import isString from 'lodash/isString';
+import { useDropzone } from 'react-dropzone';
+// @mui
+import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
+// type
+import { UploadProps } from './type';
+import BlockContent from './BlockContent';
+
+// ----------------------------------------------------------------------
+
+const DropZoneStyle = styled('div')(({ theme }) => ({
+  outline: 'none',
+  overflow: 'hidden',
+  position: 'relative',
+  padding: '23px 12px',
+  borderRadius: theme.shape.borderRadius,
+  transition: theme.transitions.create('padding'),
+  backgroundColor: theme.palette.background.neutral,
+  border: `1px dashed ${theme.palette.grey[500_32]}`,
+  '&:hover': { opacity: 0.72, cursor: 'pointer' },
+}));
+
+// ----------------------------------------------------------------------
+
+export default function UploadSingleFile({
+  error = false,
+  file,
+  helperText,
+  sx,
+  ...other
+}: UploadProps) {
+  const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
+    multiple: false,
+    ...other,
+  });
+
+  return (
+    <Box sx={{ width: '100%', ...sx }}>
+      <DropZoneStyle
+        {...getRootProps()}
+        sx={{
+          ...(isDragActive && { opacity: 0.72 }),
+          ...((isDragReject || error) && {
+            color: 'error.main',
+            borderColor: 'error.light',
+            bgcolor: 'error.lighter',
+          }),
+        }}
+      >
+        <input {...getInputProps()} />
+
+        <BlockContent />
+      </DropZoneStyle>
+
+      {file && (
+        <ul>
+          <li>{isString(file) ? file : file.name}</li>
+        </ul>
+      )}
+
+      {helperText && helperText}
+    </Box>
+  );
+}
